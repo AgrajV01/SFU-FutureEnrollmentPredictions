@@ -1,1 +1,1 @@
-# cmpt353_flight_ticket_prediction
+# cmpt353_Predicting_Academic_Performance_Based_on_Student_Sports_Activity
