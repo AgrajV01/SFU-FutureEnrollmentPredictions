@@ -31,3 +31,41 @@ Universities face the challenge of efficiently scheduling courses to meet studen
     Strategic Planning: Supporting long-term strategic planning by providing insights into evolving student demand trends and areas of growth or decline in enrollment.
 
 In conclusion, predicting course section requirements for student enrollment is a data-driven approach to optimizing university operations and enhancing the student experience. By leveraging advanced analytics and machine learning, universities can make informed decisions that align with both student needs and institutional goals.
+
+
+Resources Summary names: 
+
+    2024/25 Reports:
+
+        1247 (Fall)
+        1244 (Summer)
+
+    2023/24 Reports:
+
+        1241 (Spring)
+        1237 (Fall)
+        1234 (Summer)
+
+    2022/23 Reports:
+
+        1231 (Spring)
+        1227 (Fall)
+        1224 (Summer)
+
+    2021/22 Reports:
+
+        1221 (Spring)
+        1217 (Fall)
+        1214 (Summer)
+
+    2020/21 Reports:
+
+        1211 (Spring)
+        1207 (Fall)
+        1204 (Summer)
+
+    2019/20 Reports:
+
+        1201 (Spring)
+        1197 (Fall)
+        1194 (Summer)
