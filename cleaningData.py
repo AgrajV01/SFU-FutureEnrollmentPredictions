@@ -27,15 +27,20 @@ import sys
 # ])
 
 
-def main(in_directory, out_directory):
-
-    # file = pd.read_csv(in_directory, schema=table_schema)
-
-    print("Initial commit")
-
-    # cleaned_data.write.json(out_directory, compression='gzip', mode='overwrite')
+# def main(in_directory, out_directory):
+def main():
+    # Removing the first 6 rows, since that data isnt required.
+    data = pd.read_excel(f'data/database.1194.xlsx', header=6)
+    
+    data = data.reset_index(drop=True)
+    data['Date'] = pd.to_datetime(data['Date'])
+    # Kepping only the last date Enrolment Status as we dont need the prior date enrolment reports
+    max_date = data['Date'].max()
+    data = data[data['Date'] == max_date]
+    print(data)
 
 if __name__=='__main__':
-    in_directory = sys.argv[1]
-    out_directory = sys.argv[2]
-    main(in_directory, out_directory)
+    # in_directory = sys.argv[1]
+    # out_directory = sys.argv[2]
+    # main(in_directory, out_directory)
+    main()
