@@ -51,11 +51,15 @@ def main():
         max_date = data['Date'].max()
         data = data[data['Date'] == max_date]
         
+        # only the last file, has the column header name with Section instead of Sect, so modifying according to that
+        if file == 'database.1247.xlsx':
+            data.rename(columns={'Section': 'Sect'}, inplace=True)
+        
         # Keeping only the columns we need
         data = data[['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'ActEnrol', 'Location']]
         
         finalDataFile.append(data)
-        print(data)
+        # print(data)
 
 if __name__=='__main__':
     # in_directory = sys.argv[1]
