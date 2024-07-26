@@ -34,9 +34,14 @@ def main():
     
     data = data.reset_index(drop=True)
     data['Date'] = pd.to_datetime(data['Date'])
+    
     # Kepping only the last date Enrolment Status as we dont need the prior date enrolment reports
     max_date = data['Date'].max()
     data = data[data['Date'] == max_date]
+    
+    # Keeping only the columns we need
+    data = data[['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'ActEnrol', 'Location']]
+    
     print(data)
 
 if __name__=='__main__':
