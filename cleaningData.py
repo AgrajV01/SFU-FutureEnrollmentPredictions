@@ -29,20 +29,33 @@ import sys
 
 # def main(in_directory, out_directory):
 def main():
-    # Removing the first 6 rows, since that data isnt required.
-    data = pd.read_excel(f'data/database.1194.xlsx', header=6)
     
-    data = data.reset_index(drop=True)
-    data['Date'] = pd.to_datetime(data['Date'])
+    dataFilesList = [
+    'database.1194.xlsx', 'database.1197.xlsx', 'database.1201.xlsx', 'database.1204.xlsx', 
+    'database.1207.xlsx', 'database.1211.xlsx', 'database.1214.xlsx', 'database.1217.xlsx', 
+    'database.1221.xlsx', 'database.1224.xlsx', 'database.1227.xlsx', 'database.1231.xlsx', 
+    'database.1234.xlsx', 'database.1237.xlsx', 'database.1241.xlsx', 'database.1244.xlsx', 
+    'database.1247.xlsx'
+    ]
     
-    # Kepping only the last date Enrolment Status as we dont need the prior date enrolment reports
-    max_date = data['Date'].max()
-    data = data[data['Date'] == max_date]
+    finalDataFile = []
     
-    # Keeping only the columns we need
-    data = data[['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'ActEnrol', 'Location']]
-    
-    print(data)
+    for file in dataFilesList:
+        # Removing the first 6 rows, since that data isnt required.
+        data = pd.read_excel(f'data/{file}', header=6)
+        
+        data = data.reset_index(drop=True)
+        data['Date'] = pd.to_datetime(data['Date'])
+        
+        # Kepping only the last date Enrolment Status as we dont need the prior date enrolment reports
+        max_date = data['Date'].max()
+        data = data[data['Date'] == max_date]
+        
+        # Keeping only the columns we need
+        data = data[['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'ActEnrol', 'Location']]
+        
+        finalDataFile.append(data)
+        print(data)
 
 if __name__=='__main__':
     # in_directory = sys.argv[1]
