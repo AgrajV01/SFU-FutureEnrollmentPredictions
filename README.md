@@ -8,6 +8,8 @@ SFU Dataset:
 
     Enrolment Registration reports: https://www.sfu.ca/irp/enrolments.html
 
+    Course Diggers: https://coursediggers.com/pages/explore
+
 
 Here’s an expanded view of this project's significance:
 
