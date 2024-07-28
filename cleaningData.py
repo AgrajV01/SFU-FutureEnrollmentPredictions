@@ -1,5 +1,9 @@
 # In this file we are going filter the data we need and write them into a new file. 
 # taken some reference from https://stackoverflow.com/questions/58295555/pandas-append-new-row-with-a-different-number-of-columns
+# Title: Course Enrolment Predictions 
+# Author 1: Md Rownak Abtahee Diganta (Student ID: 301539632)
+# Author 2: Agraj Vuppula (Student ID: 301538406)
+# Author 3: gowtam Krishnan garapati (Student ID: 301596729)
 import numpy as np
 import pandas as pd
 
