@@ -48,7 +48,8 @@ def main():
     # finally create a new excel file with the cleaned data in it.
     finalDataFile = pd.concat(dataFile, ignore_index=True)
     finalDataFile = finalDataFile.groupby(['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'], as_index=False).first()
-    finalDataFile.to_excel('FinalDataFile.xlsx', index=False)
+    #finalDataFile.to_excel('FinalDataFile.xlsx', index=False) # Converting to xlsx
+    finalDataFile.to_csv('FinalDataFile.csv', index=False) # Converting to a CSV file
     
 if __name__=='__main__':
     main()
