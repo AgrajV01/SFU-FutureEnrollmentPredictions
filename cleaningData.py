@@ -11,8 +11,9 @@ def cleanData(data):
     data = data[data['Date'] == max_date]
     
     # Keeping only the columns we need
-    data = data[['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'ActEnrol', 'Location']]
-    return data
+    data1 = data[['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'ActEnrol', 'Location']]
+    data2 = data[['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'MaxEnrol', 'Location']]
+    return data1, data2
     
 def main():
     
@@ -25,7 +26,8 @@ def main():
     semName = ['Summer 2019','Fall 2019','Spring 2020','Summer 2020', 'Fall 2020', 'Spring 2021','Summer 2021', 'Fall 2021', 
         'Spring 2022','Summer 2022', 'Fall 2022','Spring 2023','Summer 2023', 'Fall 2023', 'Spring 2024','Summer 2024','Fall 2024']
     i =0
-    dataFile =[]
+    dataFile1 =[]
+    dataFile2 =[]
     for file in dataFilesList:
         
         # Removing the first 6 rows, since that data isnt required.
@@ -36,20 +38,28 @@ def main():
         if file == 'database.1247.xlsx':
             data.rename(columns={'Section': 'Sect'}, inplace=True)
         
-        data = cleanData(data)
+        # creating 2 files, one for the Max enrollment count and one for the Actual Enrolment count
+        data1, data2 = cleanData(data)
         
-        # Rename the ActEnrol column to the semester name
-        data.rename(columns={'ActEnrol': semName[i]}, inplace=True)
-        dataFile.append(data)
+        # Rename the ActEnrol and MaxEnrol column to the semester name
+        data1.rename(columns={'ActEnrol': semName[i]}, inplace=True)
+        dataFile1.append(data1)
+        data2.rename(columns={'MaxEnrol': semName[i]}, inplace=True)
+        dataFile2.append(data2)
         i =i+1
 
     # print(dataFile)
     
     # finally create a new excel file with the cleaned data in it.
-    finalDataFile = pd.concat(dataFile, ignore_index=True)
-    finalDataFile = finalDataFile.groupby(['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'], as_index=False).first()
-    #finalDataFile.to_excel('FinalDataFile.xlsx', index=False) # Converting to xlsx
-    finalDataFile.to_csv('FinalDataFile.csv', index=False) # Converting to a CSV file
+    finalDataFile1 = pd.concat(dataFile1, ignore_index=True)
+    finalDataFile1 = finalDataFile1.groupby(['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'], as_index=False).first()
+    #finalDataFile1.to_excel('ActualEnrolDataFile.xlsx', index=False) # Converting to xlsx
+    finalDataFile1.to_csv('ActualEnrolDataFile.csv', index=False) # Converting to a CSV file
+    
+    finalDataFile2 = pd.concat(dataFile2, ignore_index=True)
+    finalDataFile2 = finalDataFile2.groupby(['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'], as_index=False).first()
+    #finalDataFile2.to_excel('MaxEnrolDataFile.xlsx', index=False) # Converting to xlsx
+    finalDataFile2.to_csv('MaxEnrolDataFile.csv', index=False) # Converting to a CSV file
     
 if __name__=='__main__':
     main()
