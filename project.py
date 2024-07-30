@@ -13,6 +13,50 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
+def firstSteps():
+    # Reading Data Files 
+    actual_data = pd.read_csv('ActualEnrolDataFile.csv')
+    capacity_data = pd.read_csv('MaxEnrolDataFile.csv')
+
+    # Replace NaN Values with Zeros values
+    # Ref: https://www.geeksforgeeks.org/replace-nan-values-with-zeros-in-pandas-dataframe/ (Gained Knowledge)
+    actual_data = actual_data.fillna(0)
+    capacity_data = capacity_data.fillna(0)
+    #print(actual_data)
+    #print(capacity_data)
+
+    # Reorganizing data frames 
+    # ref: https://pandas.pydata.org/docs/reference/api/pandas.melt.html (Gained Knowledge)
+    
+    actual_data = pd.melt(
+        actual_data,
+        id_vars=['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'],
+        var_name='Term',
+        value_name='Enrollment'
+    )
+    #print(actual_data)
+    capacity_data = pd.melt(
+        capacity_data,
+        id_vars=['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'],
+        var_name='Term',
+        value_name='Max Capacity'
+    )
+    #print(actual_data)
+    # Merge the reorganized data frames
+    # ref: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.merge.html (Gained Knowledge)
+
+    data = actual_data.merge(
+        capacity_data, 
+        how='outer',
+        on=['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location', 'Term']
+    )
+    #print(data)
+    
+    # knn 
+    grouped_data = data.groupby(['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'])
+    # print(grouped_data)
+    return data
+    
 # Function for predicting future enrollment
 def predicting_future_enrollment(data):
     def knn_prediction(group):
@@ -60,47 +104,7 @@ def seasonal_enrollment_patterns(data):
     
 def main():
     
-    # Reading Data Files 
-    actual_data = pd.read_csv('ActualEnrolDataFile.csv')
-    capacity_data = pd.read_csv('MaxEnrolDataFile.csv')
-
-    # Replace NaN Values with Zeros values
-    # Ref: https://www.geeksforgeeks.org/replace-nan-values-with-zeros-in-pandas-dataframe/ (Gained Knowledge)
-    actual_data = actual_data.fillna(0)
-    #print(actual_data)
-    capacity_data = capacity_data.fillna(0)
-    #print(capacity_data)
-
-    # Reorganizing data frames 
-    # ref: https://pandas.pydata.org/docs/reference/api/pandas.melt.html (Gained Knowledge)
-    
-    actual_data = pd.melt(
-        actual_data,
-        id_vars=['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'],
-        var_name='Term',
-        value_name='Enrollment'
-    )
-    #print(actual_data)
-    capacity_data = pd.melt(
-        capacity_data,
-        id_vars=['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'],
-        var_name='Term',
-        value_name='Max Capacity'
-    )
-    #print(actual_data)
-    # Merge the reorganized data frames
-    # ref: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.merge.html (Gained Knowledge)
-    
-    data = actual_data.merge(
-        capacity_data, 
-        how='outer',
-        on=['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location', 'Term']
-    )
-    #print(data)
-    
-    # knn 
-    grouped_data = data.groupby(['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'])
-    print(grouped_data)
+    data = firstSteps()
     
     # User Interface  
     
