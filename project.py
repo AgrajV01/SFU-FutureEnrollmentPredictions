@@ -12,6 +12,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import r2_score
+
 
 def firstSteps():
     # Reading Data Files 
@@ -22,8 +24,6 @@ def firstSteps():
     # Ref: https://www.geeksforgeeks.org/replace-nan-values-with-zeros-in-pandas-dataframe/ (Gained Knowledge)
     actual_data = actual_data.fillna(0)
     capacity_data = capacity_data.fillna(0)
-    #print(actual_data)
-    #print(capacity_data)
 
     # Reorganizing data frames 
     # ref: https://pandas.pydata.org/docs/reference/api/pandas.melt.html (Gained Knowledge)
@@ -40,8 +40,6 @@ def firstSteps():
         var_name='Term',
         value_name='Max Capacity'
     )
-    #print(actual_data)
-    #print(capacity_data)
     
     # Merge the reorganized data frames
     # ref: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.merge.html (Gained Knowledge)
@@ -55,6 +53,10 @@ def firstSteps():
     
 # Function for predicting future enrollment
 def predicting_future_enrollment(data):
+    # refernce links: https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html
+    # https://www.geeksforgeeks.org/python-coefficient-of-determination-r2-score/
+    all_y_valid = []
+    all_y_pred = []
     def knn_prediction(group):
         group = group.dropna(subset=['Enrollment'])
         # If a course has less than 3 records, then retun Nan
@@ -64,19 +66,33 @@ def predicting_future_enrollment(data):
         X = np.arange(len(group)).reshape(-1, 1)
         y = group['Enrollment'].values
         
+        # Split the data into training and validation sets
+        X_train, X_valid, y_train, y_valid = train_test_split(X, y)
+        
         # Train KNN regressor
         model = make_pipeline(
             StandardScaler(), 
             # KNeighborsRegressor(n_neighbors= min(3, len(group)))
             KNeighborsRegressor(n_neighbors= 3))
-        model.fit(X, y)
         
+        model.fit(X_train, y_train)
+        # Validate the model on the validation set
+        y_pred = model.predict(X_valid)
+        
+        # Accumulate the actual and predicted values
+        all_y_valid.extend(y_valid)
+        all_y_pred.extend(y_pred)
+
         # Predict next 3 terms
         future_X = np.array([[len(group)], [len(group) + 1], [len(group) + 2]])
         future_predictions = model.predict(future_X)
         return pd.Series(future_predictions, index=['Next Fall', 'Next Spring', 'Next Summer'])
     predictions = data.groupby(['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location']).apply(knn_prediction)
-    # predictions.to_csv('predictions.csv', index=True)
+    
+    # to print the avergae scores
+    overall_r2_score = r2_score(all_y_valid, all_y_pred)
+    print(f'Overall R² score: {overall_r2_score}')
+    
     return predictions
 
 def enrollment_trend_analysis(data):
