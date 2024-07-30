@@ -9,27 +9,54 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier 
+from sklearn.neighbors import KNeighborsRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 # Function for predicting future enrollment
 def predicting_future_enrollment(data):
-    # Anna Fill 
+    def knn_prediction(group):
+        group = group.dropna(subset=['Enrollment'])
+        # If a course has less than 3 records, then retun Nan
+        if len(group) < 3:
+            return pd.Series([np.nan, np.nan, np.nan], index=['Next Fall', 'Next Spring', 'Next Summer'])
+        
+        X = np.arange(len(group)).reshape(-1, 1)
+        y = group['Enrollment'].values
+        
+        # Train KNN regressor
+        model = make_pipeline(
+            StandardScaler(), 
+            # KNeighborsRegressor(n_neighbors= min(3, len(group)))
+            KNeighborsRegressor(n_neighbors= 3))
+        model.fit(X, y)
+        
+        # Predict next 3 terms
+        future_X = np.array([[len(group)], [len(group) + 1], [len(group) + 2]])
+        future_predictions = model.predict(future_X)
+        return pd.Series(future_predictions, index=['Next Fall', 'Next Spring', 'Next Summer'])
+    predictions = data.groupby(['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location']).apply(knn_prediction)
+    return predictions
 
 def enrollment_trend_analysis(data):
-    # Anna Fill 
+    # Anna Fill
+    print("Hello")
 
 def identify_over_under_subscribed_courses(data):
     # Anna Fill 
+    return data['Subject'],data['CatNbr']
     
 def predict_high_demand_courses(data):
     # Anna Fill 
+    return data
 
 def predict_low_demand_courses(data):
     # Anna Fill 
+    return data
     
 def seasonal_enrollment_patterns(data):
     # Anna Fill 
+    print("Hello")
     
 def main():
     
@@ -68,7 +95,6 @@ def main():
         capacity_data, 
         how='outer',
         on=['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location', 'Term']
-        
     )
     #print(data)
     
@@ -76,7 +102,7 @@ def main():
     grouped_data = data.groupby(['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'])
     print(grouped_data)
     
-    # User Interface in Terminal 
+    # User Interface  
     
     print("Welcome to our data science software!! \n")
     print("This software will help you to get a lot of important predictions and information regarding courses offered here in SFU.\n")
@@ -92,16 +118,12 @@ def main():
         print("5. Predict Low-Demand Courses")
         print("6. Seasonal Enrollment Patterns")
         print("7. Exit")
-        print("\nPlease enter a number from 1 to 7.\n")
         try:
-            
-            choice = int(input("Enter the number of your choice: "))
-            print("\n")
-
+            choice = int(input("\nPlease enter a number from 1 to 7: "))
             if choice == 1:
                 print("You have chosen option 1.")
-                predict_data= predicting_future_enrollment(data)
-                #print(predictions)
+                predictions= predicting_future_enrollment(data)
+                print(predictions)
             elif choice == 2:
                 print("You have chosen option 2.")
                 enrollment_trend_analysis(data)
@@ -123,14 +145,13 @@ def main():
                 seasonal_enrollment_patterns(data)
             elif choice == 7:
                 print("\nYou have chosen option 7.")
-                print("\nExiting the programme. \n")
-                print("Thank you for using our software!! Hope that you had a nice experience. Have a good day!!!")
+                print("\nExiting the programme.")
+                print("Thank you for using our software!! Hope that you had a nice experience. Have a good day!!!\n")
                 flag = False # Changing the flag to exit the code
-                
             else:
-                print("Invalid choice. Please select a valid option.")
+                print("Invalid choice! Select between 1-7.")
         except ValueError:
-            print("You have entered a value which is not integer. Please enter a number from 1 to 7.")   
+            print("Wrong Input! Try Again!!")   
             
 if __name__ == '__main__':
     main()
