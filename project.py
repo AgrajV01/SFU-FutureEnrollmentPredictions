@@ -34,7 +34,6 @@ def firstSteps():
         var_name='Term',
         value_name='Enrollment'
     )
-    #print(actual_data)
     capacity_data = pd.melt(
         capacity_data,
         id_vars=['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'],
@@ -42,19 +41,16 @@ def firstSteps():
         value_name='Max Capacity'
     )
     #print(actual_data)
+    #print(capacity_data)
+    
     # Merge the reorganized data frames
     # ref: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.merge.html (Gained Knowledge)
-
     data = actual_data.merge(
         capacity_data, 
         how='outer',
         on=['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location', 'Term']
     )
-    #print(data)
-    
-    # knn 
-    grouped_data = data.groupby(['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'])
-    # print(grouped_data)
+    # print(data)
     return data
     
 # Function for predicting future enrollment
@@ -80,6 +76,7 @@ def predicting_future_enrollment(data):
         future_predictions = model.predict(future_X)
         return pd.Series(future_predictions, index=['Next Fall', 'Next Spring', 'Next Summer'])
     predictions = data.groupby(['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location']).apply(knn_prediction)
+    # predictions.to_csv('predictions.csv', index=True)
     return predictions
 
 def enrollment_trend_analysis(data):
@@ -108,10 +105,10 @@ def main():
     
     # User Interface  
     
-    print("Welcome to our data science software!! \n")
-    print("This software will help you to get a lot of important predictions and information regarding courses offered here in SFU.\n")
-    print("This software will show you options and you need to choose the desired option to know that particular thing you want to know.\n")
-    print("The options are given below.\n")
+    print("\nWelcome to our data science software!! ")
+    print("This software will help you to get a lot of important predictions and information regarding courses offered here in SFU.")
+    print("This software will show you options and you need to choose the desired option to know that particular thing you want to know.")
+    print("The options are given below.")
     flag = True # To control the loops of the prompts 
     while flag:
         print("\nChoose an analysis type:\n")
