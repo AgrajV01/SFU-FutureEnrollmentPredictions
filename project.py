@@ -156,16 +156,38 @@ def predict_low_demand_courses(data):
     return low_demand
     
 def seasonal_enrollment_patterns(data):
-    data['Season'] = data['Term'].str.split().str[0]
-    temp = data.groupby('Season')['Enrollment'].mean().reindex(['Spring', 'Summer', 'Fall'])
+    print("1: Check the Overall Seasonal Enrollment pattern")
+    print("2: Check Enrollment trend of a specific course")
+    choice1 = int(input("\nSelect between 1 or 2: "))
     
-    plt.figure(figsize=(10, 6))
-    temp.plot(kind='bar', color='skyblue')
-    plt.xlabel('Season')
-    plt.ylabel('Average Enrollment')
-    plt.title('Average Enrollment by Season')
-    plt.show()
+    if (choice1 ==1):
+        data['Season'] = data['Term'].str.split().str[0]
+        temp = data.groupby('Season')['Enrollment'].mean().reindex(['Spring', 'Summer', 'Fall'])
+        
+        plt.figure(figsize=(10, 6))
+        temp.plot(kind='bar', color='skyblue')
+        plt.xlabel('Season')
+        plt.ylabel('Average Enrollment')
+        plt.title('Average Enrollment by Season')
+        plt.show()
+    elif(choice1 == 2):
+        choice2 = input("\nEnter the Subject and CatNbr(Example CMPT 353): ")
+        subject , catNbr = choice2.split()
+        
+        temp = data[(data['Subject'] == subject) & (data['CatNbr'] == catNbr)]
+        temp['Season'] = temp['Term'].str.split().str[0]
+        temp = data.groupby('Season')['Enrollment'].mean().reindex(['Spring', 'Summer', 'Fall'])
     
+        plt.figure(figsize=(10, 6))
+        temp.plot(kind='bar', color='skyblue')
+        plt.xlabel('Season')
+        plt.ylabel('Average Enrollment')
+        plt.title(f'Average Enrollment by Season for {subject} {catNbr}')
+
+        plt.show()
+    else:
+        print("Wrong Input!!")
+
 def main():
     
     data = firstSteps()
