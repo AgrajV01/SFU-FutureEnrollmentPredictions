@@ -112,7 +112,6 @@ def enrollment_trend_analysis(data):
         trend = data.pivot(index=['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'], columns='Term',
                            values='Enrollment').mean()
         trend.plot(kind='line', title='Overall Enrollment Trend Analysis')
-        plt.figure(figsize=(15, 6))
         plt.xlabel('Term')
         plt.ylabel('Average Enrollment')
         plt.show()
