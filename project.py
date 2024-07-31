@@ -47,6 +47,11 @@ def firstSteps():
         on=['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location', 'Term']
     )
     # print(data)
+    semName = ['Summer 2019', 'Fall 2019', 'Spring 2020', 'Summer 2020', 'Fall 2020', 'Spring 2021', 'Summer 2021', 
+               'Fall 2021', 'Spring 2022', 'Summer 2022', 'Fall 2022', 'Spring 2023', 'Summer 2023', 'Fall 2023', 
+               'Spring 2024', 'Summer 2024', 'Fall 2024']
+    data['Term'] = pd.Categorical(data['Term'], categories=semName, ordered=True)
+    # print(data)
     return data
     
 # Function for predicting future enrollment
@@ -94,11 +99,6 @@ def predicting_future_enrollment(data):
     return predictions
 
 def enrollment_trend_analysis(data):
-    semName = ['Summer 2019', 'Fall 2019', 'Spring 2020', 'Summer 2020', 'Fall 2020', 'Spring 2021', 'Summer 2021', 
-               'Fall 2021', 'Spring 2022', 'Summer 2022', 'Fall 2022', 'Spring 2023', 'Summer 2023', 'Fall 2023', 
-               'Spring 2024', 'Summer 2024', 'Fall 2024']
-    data['Term'] = pd.Categorical(data['Term'], categories=semName, ordered=True)
-    
     print("1: Check the Overall Enrollment trend")
     print("2: Check Enrollment trend of a specific course")
     choice1 = int(input("\nSelect between 1 or 2: "))
@@ -106,6 +106,7 @@ def enrollment_trend_analysis(data):
     if(choice1 == 1):
         trend = data.pivot(index=['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'], columns='Term', values='Enrollment').mean()
         trend.plot(kind='line', title='Overall Enrollment Trend Analysis')
+        plt.figure(figsize=(15, 6))
         plt.xlabel('Term')
         plt.ylabel('Average Enrollment')
         plt.show()
@@ -117,7 +118,7 @@ def enrollment_trend_analysis(data):
         grouped = temp.groupby(['Subject', 'CatNbr','Course Title', 'Sect', 'Type', 'Location']) 
 
         for name, group in grouped:
-            plt.figure(figsize=(10, 6))
+            plt.figure(figsize=(15, 6))
             plt.plot(group['Term'], group['Enrollment'], marker='o')
             plt.title(f"Enrollment Trend for {name}")
             plt.xlabel("Term")
@@ -127,20 +128,43 @@ def enrollment_trend_analysis(data):
         print("Wrong Input!!")
 
 def identify_over_under_subscribed_courses(data):
-    
-    return data['Subject'],data['CatNbr']
+    def courseUtlization(group):
+        group = group.dropna(subset=['Enrollment', 'Max Capacity'])
+        if len(group) == 0:
+            return np.nan
+        temp = group['Enrollment'] / group['Max Capacity']
+        return np.mean(temp)
+
+    temp = data.groupby(['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location']).apply(courseUtlization)
+    over_subscribed = temp[temp > 0.95]
+    under_subscribed = temp[temp < 0.5]
+
+    return over_subscribed, under_subscribed
     
 def predict_high_demand_courses(data):
-    # Anna Fill 
-    return data
+    choice = int(input("\nEnter the Minimum average number of students to consider a course high-demand: "))
+    # high demand means that the average predicted enrollment is greater than the choice taken.
+    temp = predicting_future_enrollment(data)
+    high_demand = temp[temp.apply(lambda x: np.mean(x) > choice, axis=1)]  
+    return high_demand
 
 def predict_low_demand_courses(data):
-    # Anna Fill 
-    return data
+    choice = int(input("\nEnter the Maximim average number of students to consider a course low-demand: "))
+    # low demand means that the average predicted enrollment is lower than the choice taken.
+    temp = predicting_future_enrollment(data)
+    low_demand = temp[temp.apply(lambda x: np.mean(x) < choice, axis=1)]  
+    return low_demand
     
 def seasonal_enrollment_patterns(data):
-    # Anna Fill 
-    print("Hello")
+    data['Season'] = data['Term'].str.split().str[0]
+    temp = data.groupby('Season')['Enrollment'].mean().reindex(['Spring', 'Summer', 'Fall'])
+    
+    plt.figure(figsize=(10, 6))
+    temp.plot(kind='bar', color='skyblue')
+    plt.xlabel('Season')
+    plt.ylabel('Average Enrollment')
+    plt.title('Average Enrollment by Season')
+    plt.show()
     
 def main():
     
