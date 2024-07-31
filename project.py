@@ -1,7 +1,7 @@
-# Title: Course Enrolment Predictions
+# Title: Course Enrolment Predictions 
 # Author 1: Md Rownak Abtahee Diganta (Student ID: 301539632)
-# Author 2: Agraj Vuppula             (Student ID: 301538406)
-# Author 3: gowtam Krishnan garapati  (Student ID: 301596729)
+# Author 2: Agraj Vuppula (Student ID: 301538406)
+# Author 3: Gowtam Krishnan Garapati (Student ID: 301596729)
 
 # All the imports
 import pandas as pd
