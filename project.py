@@ -204,8 +204,8 @@ def main():
     data = firstSteps()
 
     # Load the professor ratings and course diggers data
-    professor_data = pd.read_csv('professor_ratings_cleaned.csv')
-    course_data = pd.read_csv('courseDiggers.csv')
+    professor_data = pd.read_csv('data/professor_ratings_cleaned.csv')
+    course_data = pd.read_csv('data/courseDiggers.csv')
 
     # User Interface
 
