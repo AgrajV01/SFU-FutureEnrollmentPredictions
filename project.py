@@ -168,14 +168,38 @@ def predict_low_demand_courses(data):
 def seasonal_enrollment_patterns(data):
     data['Season'] = data['Term'].str.split().str[0]
     temp = data.groupby('Season')['Enrollment'].mean().reindex(['Spring', 'Summer', 'Fall'])
-    
+
     plt.figure(figsize=(10, 6))
     temp.plot(kind='bar', color='skyblue')
     plt.xlabel('Season')
     plt.ylabel('Average Enrollment')
     plt.title('Average Enrollment by Season')
     plt.show()
-    
+
+
+def recommend_courses_with_good_ratings(professor_data, course_data):
+    # Calculate the average rating for each course
+    course_ratings = professor_data.groupby('Class_Name')['Quality'].mean().reset_index()
+    course_ratings.columns = ['Class_Name', 'Average_Rating']
+
+    # Merge with course data to get course details
+    recommended_courses = course_data.merge(course_ratings, how='left', left_on='Course Number', right_on='Class_Name')
+
+    # Filter courses with an average rating above a certain threshold, e.g., 4.0
+    recommended_courses = recommended_courses[recommended_courses['Average_Rating'] >= 4.0]
+
+    return recommended_courses
+
+
+def recommend_professors_for_course(professor_data, course_name):
+    # Filter professors who have taught the specified course
+    recommended_professors = professor_data[professor_data['Class_Name'] == course_name]
+
+    # Sort by quality rating in descending order
+    recommended_professors = recommended_professors.sort_values(by='Quality', ascending=False)
+
+    return recommended_professors
+
 def main():
     data = firstSteps()
 
