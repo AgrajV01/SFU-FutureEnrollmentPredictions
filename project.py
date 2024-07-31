@@ -177,20 +177,19 @@ def seasonal_enrollment_patterns(data):
 
 
 def recommend_courses_with_good_ratings(professor_data, course_data):
-    # Calculate the average rating for each course
-    course_ratings = professor_data.groupby('Class_Name')['Quality'].mean().reset_index()
-    course_ratings.columns = ['Class_Name', 'Average_Rating']
+    easy_difficulty = 2
+    easy_workload = 2
+    # Strip spaces from column names and course names
+    course_data.columns = course_data.columns.str.strip()
 
-    # Merge with course data to get course details
-    recommended_courses = course_data.merge(course_ratings, how='left', left_on='Course Number', right_on='Class_Name')
-
-    # Filter courses with an average rating above a certain threshold, e.g., 4.0
-    recommended_courses = recommended_courses[recommended_courses['Average_Rating'] >= 4.0]
+    # Filter courses based on difficulty and workload
+    recommended_courses = course_data[(course_data['DIFFICULTY'] <= easy_difficulty) &
+                                      (course_data['WORKLOAD'] <= easy_workload)]
 
     return recommended_courses
 
-
 def recommend_professors_for_course(professor_data, course_name):
+
     # Filter professors who have taught the specified course
     recommended_professors = professor_data[professor_data['Class_Name'] == course_name]
 
@@ -203,7 +202,7 @@ def main():
     data = firstSteps()
 
     # Load the professor ratings and course diggers data
-    professor_data = pd.read_csv('data/professor_ratings_cleaned.csv')
+    professor_data = pd.read_csv('data/cleaned_professor_ratings_data.csv')
     course_data = pd.read_csv('data/courseDiggers.csv')
 
     # User Interface
