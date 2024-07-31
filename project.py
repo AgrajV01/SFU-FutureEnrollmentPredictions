@@ -14,7 +14,6 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import r2_score
 
-
 def firstSteps():
     # Reading Data Files 
     actual_data = pd.read_csv('ActualEnrolDataFile.csv')
@@ -27,7 +26,6 @@ def firstSteps():
 
     # Reorganizing data frames 
     # ref: https://pandas.pydata.org/docs/reference/api/pandas.melt.html (Gained Knowledge)
-    
     actual_data = pd.melt(
         actual_data,
         id_vars=['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'],
@@ -96,11 +94,40 @@ def predicting_future_enrollment(data):
     return predictions
 
 def enrollment_trend_analysis(data):
-    # Anna Fill
-    print("Hello")
+    semName = ['Summer 2019', 'Fall 2019', 'Spring 2020', 'Summer 2020', 'Fall 2020', 'Spring 2021', 'Summer 2021', 
+               'Fall 2021', 'Spring 2022', 'Summer 2022', 'Fall 2022', 'Spring 2023', 'Summer 2023', 'Fall 2023', 
+               'Spring 2024', 'Summer 2024', 'Fall 2024']
+    data['Term'] = pd.Categorical(data['Term'], categories=semName, ordered=True)
+    
+    print("1: Check the Overall Enrollment trend")
+    print("2: Check Enrollment trend of a specific course")
+    choice1 = int(input("\nSelect between 1 or 2: "))
+    
+    if(choice1 == 1):
+        trend = data.pivot(index=['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'], columns='Term', values='Enrollment').mean()
+        trend.plot(kind='line', title='Overall Enrollment Trend Analysis')
+        plt.xlabel('Term')
+        plt.ylabel('Average Enrollment')
+        plt.show()
+    elif(choice1 == 2):
+        choice2 = input("\nEnter the Subject and CatNbr(Example CMPT 353): ")
+        subject , catNbr = choice2.split()
+        
+        temp = data[(data['Subject'] == subject) & (data['CatNbr'] == catNbr)]
+        grouped = temp.groupby(['Subject', 'CatNbr','Course Title', 'Sect', 'Type', 'Location']) 
+
+        for name, group in grouped:
+            plt.figure(figsize=(10, 6))
+            plt.plot(group['Term'], group['Enrollment'], marker='o')
+            plt.title(f"Enrollment Trend for {name}")
+            plt.xlabel("Term")
+            plt.ylabel("Enrollment")
+            plt.show()
+    else:
+        print("Wrong Input!!")
 
 def identify_over_under_subscribed_courses(data):
-    # Anna Fill 
+    
     return data['Subject'],data['CatNbr']
     
 def predict_high_demand_courses(data):
@@ -138,30 +165,23 @@ def main():
         try:
             choice = int(input("\nPlease enter a number from 1 to 7: "))
             if choice == 1:
-                print("You have chosen option 1.")
                 predictions= predicting_future_enrollment(data)
                 print(predictions)
             elif choice == 2:
-                print("You have chosen option 2.")
                 enrollment_trend_analysis(data)
             elif choice == 3:
-                print("You have chosen option 3.")
                 over_subscribed, under_subscribed = identify_over_under_subscribed_courses(data)
                 print("Over Subscribed Courses:", over_subscribed)
                 print("Under Subscribed Courses:", under_subscribed)
             elif choice == 4:
-                print("You have chosen option 4.")
                 high_demand_courses = predict_high_demand_courses(data)
                 print(high_demand_courses)
             elif choice == 5:
-                print("You have chosen option 5.")
                 low_demand_courses = predict_low_demand_courses(data)
                 print(low_demand_courses)
             elif choice == 6:
-                print("You have chosen option 6.")
                 seasonal_enrollment_patterns(data)
             elif choice == 7:
-                print("\nYou have chosen option 7.")
                 print("\nExiting the programme.")
                 print("Thank you for using our software!! Hope that you had a nice experience. Have a good day!!!\n")
                 flag = False # Changing the flag to exit the code
