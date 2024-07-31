@@ -1,3 +1,5 @@
+# Code for Extracting Data from ratemyprofessor by using web scrapping 
+
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
