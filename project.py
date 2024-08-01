@@ -175,6 +175,7 @@ def seasonal_enrollment_patterns(data):
     plt.xlabel('Season')
     plt.ylabel('Average Enrollment')
     plt.title('Average Enrollment by Season')
+    plt.xticks(rotation=0)
     plt.show()
 
 def recommend_courses_using_courseDiggers(course_data):
