@@ -140,6 +140,7 @@ def enrollment_trend_analysis(data):
             plt.title(f"Enrollment Trend for {name}")
             plt.xlabel("Term")
             plt.ylabel("Enrollment")
+            plt.xticks(rotation=35)
             plt.show()
     else:
         print("Wrong Input!!")
