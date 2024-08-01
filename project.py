@@ -19,6 +19,9 @@ def firstSteps():
     # Reading Data Files
     actual_data = pd.read_csv('ActualEnrolDataFile.csv')
     capacity_data = pd.read_csv('MaxEnrolDataFile.csv')
+    # Load the professor ratings and course diggers data
+    rateMyProfData = pd.read_csv('data/cleaned_professor_ratings_data.csv')
+    courseDiggersData = pd.read_csv('data/courseDiggers.csv')
 
     # Replace NaN Values with Zeros values
     # Ref: https://www.geeksforgeeks.org/replace-nan-values-with-zeros-in-pandas-dataframe/ (Gained Knowledge)
@@ -53,9 +56,16 @@ def firstSteps():
                'Spring 2024', 'Summer 2024', 'Fall 2024']
     data['Term'] = pd.Categorical(data['Term'], categories=semName, ordered=True)
     # print(data)
-    return data
+    return data, courseDiggersData, rateMyProfData
 
-
+# Helper function
+def courseUtlization(group):
+        group = group.dropna(subset=['Enrollment', 'Max Capacity'])
+        if len(group) == 0:
+            return np.nan
+        temp = group['Enrollment'] / group['Max Capacity']
+        return np.mean(temp)
+    
 # Function for predicting future enrollment
 def predicting_future_enrollment(data):
     # refernce links: https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html
@@ -69,6 +79,7 @@ def predicting_future_enrollment(data):
         if len(group) < 3:
             return pd.Series([np.nan, np.nan, np.nan], index=['Next Fall', 'Next Spring', 'Next Summer'])
 
+        #  should change
         X = np.arange(len(group)).reshape(-1, 1)
         y = group['Enrollment'].values
 
@@ -112,6 +123,7 @@ def enrollment_trend_analysis(data):
         trend = data.pivot(index=['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'], columns='Term',
                            values='Enrollment').mean()
         trend.plot(kind='line', title='Overall Enrollment Trend Analysis')
+        plt.xticks(ticks=range(len(trend.index)), labels=trend.index, rotation=35) 
         plt.xlabel('Term')
         plt.ylabel('Average Enrollment')
         plt.show()
@@ -131,22 +143,13 @@ def enrollment_trend_analysis(data):
             plt.show()
     else:
         print("Wrong Input!!")
-
-
+    
 def identify_over_under_subscribed_courses(data):
-    def courseUtlization(group):
-        group = group.dropna(subset=['Enrollment', 'Max Capacity'])
-        if len(group) == 0:
-            return np.nan
-        temp = group['Enrollment'] / group['Max Capacity']
-        return np.mean(temp)
-
     temp = data.groupby(['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location']).apply(courseUtlization)
-    over_subscribed = temp[temp > 0.95]
-    under_subscribed = temp[temp < 0.5]
+    over_enrolled = temp[temp > 0.90]
+    under_enrolled = temp[temp < 0.50]
 
-    return over_subscribed, under_subscribed
-
+    return over_enrolled, under_enrolled
 
 def predict_high_demand_courses(data):
     choice = int(input("\nEnter the Minimum average number of students to consider a course high-demand: "))
@@ -155,14 +158,12 @@ def predict_high_demand_courses(data):
     high_demand = temp[temp.apply(lambda x: np.mean(x) > choice, axis=1)]
     return high_demand
 
-
 def predict_low_demand_courses(data):
     choice = int(input("\nEnter the Maximim average number of students to consider a course low-demand: "))
     # low demand means that the average predicted enrollment is lower than the choice taken.
     temp = predicting_future_enrollment(data)
     low_demand = temp[temp.apply(lambda x: np.mean(x) < choice, axis=1)]
     return low_demand
-
 
 def seasonal_enrollment_patterns(data):
     data['Season'] = data['Term'].str.split().str[0]
@@ -175,43 +176,32 @@ def seasonal_enrollment_patterns(data):
     plt.title('Average Enrollment by Season')
     plt.show()
 
-
-def recommend_courses_with_good_ratings(professor_data, course_data):
+def recommend_courses_using_courseDiggers(course_data):
     easy_difficulty = 2
     easy_workload = 2
     # Strip spaces from column names and course names
     course_data.columns = course_data.columns.str.strip()
-
     # Filter courses based on difficulty and workload
-    recommended_courses = course_data[(course_data['DIFFICULTY'] <= easy_difficulty) &
-                                      (course_data['WORKLOAD'] <= easy_workload)]
-
+    recommended_courses = course_data[(course_data['DIFFICULTY'] <= easy_difficulty) & (course_data['WORKLOAD'] <= easy_workload)]
     return recommended_courses
 
-def recommend_professors_for_course(professor_data, course_name):
-
+def recommend_professors_using_rateMyProf(professor_data, course_name):
     # Filter professors who have taught the specified course
-    recommended_professors = professor_data[professor_data['Class_Name'] == course_name]
-
+    temp = professor_data[professor_data['Class_Name'] == course_name]
+    if temp.empty:
+        print(f"No professors found for the course: {course_name}")
+        return None
     # Sort by quality rating in descending order
-    recommended_professors = recommended_professors.sort_values(by='Quality', ascending=False)
-
-    return recommended_professors
+    temp = temp.sort_values(by='Quality', ascending=False)
+    return temp
 
 def main():
-    data = firstSteps()
-
-    # Load the professor ratings and course diggers data
-    professor_data = pd.read_csv('data/cleaned_professor_ratings_data.csv')
-    course_data = pd.read_csv('data/courseDiggers.csv')
-
+    data,courseDiggersData, rateMyProfData  = firstSteps()
     # User Interface
 
     print("\nWelcome to our data science software!! ")
-    print(
-        "This software will help you to get a lot of important predictions and information regarding courses offered here in SFU.")
-    print(
-        "This software will show you options and you need to choose the desired option to know that particular thing you want to know.")
+    print("This software will help you to get a lot of important predictions and information regarding courses offered here in SFU.")
+    print("This software will show you options and you need to choose the desired option to know that particular thing you want to know.")
     print("The options are given below.")
     flag = True  # To control the loops of the prompts
     while flag:
@@ -245,14 +235,12 @@ def main():
             elif choice == 6:
                 seasonal_enrollment_patterns(data)
             elif choice == 7:
-                print("You have chosen option 7.")
-                recommended_courses = recommend_courses_with_good_ratings(professor_data, course_data)
-                print(recommended_courses)
+                temp = recommend_courses_using_courseDiggers(courseDiggersData)
+                print(temp)
             elif choice == 8:
-                print("You have chosen option 8.")
-                course_name = input("Please enter the course name: ")
-                recommended_professors = recommend_professors_for_course(professor_data, course_name)
-                print(recommended_professors)
+                course = input("Please enter the course name(Example CMPT353): ")
+                temp = recommend_professors_using_rateMyProf(rateMyProfData, course)
+                print(temp)
             elif choice == 9:
                 print("\nExiting the programme.")
                 print("Thank you for using our software!! Hope that you had a nice experience. Have a good day!!!\n")
