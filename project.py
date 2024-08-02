@@ -20,7 +20,7 @@ def firstSteps():
     actual_data = pd.read_csv('ActualEnrolDataFile.csv')
     capacity_data = pd.read_csv('MaxEnrolDataFile.csv')
     # Load the professor ratings and course diggers data
-    rateMyProfData = pd.read_csv('data/cleaned_professor_ratings_data.csv')
+    rateMyProfData = pd.read_csv('data/new_professor_ratings_all.csv')
     courseDiggersData = pd.read_csv('data/courseDiggers.csv')
 
     # Replace NaN Values with Zeros values
@@ -188,14 +188,16 @@ def recommend_courses_using_courseDiggers(course_data):
     return recommended_courses
 
 def recommend_professors_using_rateMyProf(professor_data, course_name):
-    # Filter professors who have taught the specified course
-    temp = professor_data[professor_data['Class_Name'] == course_name]
-    if temp.empty:
-        print(f"No professors found for the course: {course_name}")
-        return None
-    # Sort by quality rating in descending order
-    temp = temp.sort_values(by='Quality', ascending=False)
-    return temp
+   # Filter professors who have taught the specified course
+    filtered_professors = professor_data[professor_data['Class_Name'] == course_name]
+    # Sort by Quality in descending order and Difficulty in ascending order
+    sorted_professors = filtered_professors.sort_values(by=['Quality', 'Difficulty'], ascending=[False, True])
+    # Select the best professor
+    if not sorted_professors.empty:
+        best_professor = sorted_professors.iloc[0]
+        print(best_professor)
+    else:
+        print(f"No professor data available for the course: {course_name}")
 
 def main():
     data,courseDiggersData, rateMyProfData  = firstSteps()
