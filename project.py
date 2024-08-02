@@ -122,7 +122,7 @@ def enrollment_trend_analysis(data):
     if (choice1 == 1):
         trend = data.pivot(index=['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location'], columns='Term',
                            values='Enrollment').mean()
-        trend.plot(kind='line', title='Overall Enrollment Trend Analysis')
+        trend.plot(kind='bar', title='Overall Enrollment Trend Analysis')
         plt.xticks(ticks=range(len(trend.index)), labels=trend.index, rotation=35) 
         plt.xlabel('Term')
         plt.ylabel('Average Enrollment')
@@ -136,7 +136,8 @@ def enrollment_trend_analysis(data):
 
         for name, group in grouped:
             plt.figure(figsize=(15, 6))
-            plt.plot(group['Term'], group['Enrollment'], marker='o')
+            # plt.plot(group['Term'], group['Enrollment'], marker='o')
+            group.set_index('Term')['Enrollment'].plot(kind='bar')
             plt.title(f"Enrollment Trend for {name}")
             plt.xlabel("Term")
             plt.ylabel("Enrollment")
@@ -145,7 +146,7 @@ def enrollment_trend_analysis(data):
     else:
         print("Wrong Input!!")
     
-def identify_over_under_subscribed_courses(data):
+def identify_over_under_enrolled_courses(data):
     temp = data.groupby(['Subject', 'CatNbr', 'Course Title', 'Sect', 'Type', 'Location']).apply(courseUtlization)
     over_enrolled = temp[temp > 0.90]
     under_enrolled = temp[temp < 0.50]
@@ -171,7 +172,7 @@ def seasonal_enrollment_patterns(data):
     temp = data.groupby('Season')['Enrollment'].mean().reindex(['Spring', 'Summer', 'Fall'])
 
     plt.figure(figsize=(10, 6))
-    temp.plot(kind='bar', color='skyblue')
+    temp.plot(kind='bar')
     plt.xlabel('Season')
     plt.ylabel('Average Enrollment')
     plt.title('Average Enrollment by Season')
@@ -212,7 +213,7 @@ def main():
         print("\nChoose an analysis type:\n")
         print("1. Predicting Future Enrollment")
         print("2. Enrollment Trend Analysis")
-        print("3. Identify Over/Under Subscribed Courses")
+        print("3. Identify Over/Under Enrolled Courses")
         print("4. Predict High-Demand Courses")
         print("5. Predict Low-Demand Courses")
         print("6. Seasonal Enrollment Patterns")
@@ -227,9 +228,9 @@ def main():
             elif choice == 2:
                 enrollment_trend_analysis(data)
             elif choice == 3:
-                over_subscribed, under_subscribed = identify_over_under_subscribed_courses(data)
-                print("Over Subscribed Courses:", over_subscribed)
-                print("Under Subscribed Courses:", under_subscribed)
+                over_enrolled, under_enrolled = identify_over_under_enrolled_courses(data)
+                print("Over Enrolled Courses:", over_enrolled)
+                print("Under Enrolled Courses:", under_enrolled)
             elif choice == 4:
                 high_demand_courses = predict_high_demand_courses(data)
                 print(high_demand_courses)
