@@ -11,9 +11,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.metrics import r2_score
-
 
 def firstSteps():
     # Reading Data Files
@@ -89,8 +88,8 @@ def predicting_future_enrollment(data):
         # Train KNN regressor
         model = make_pipeline(
             StandardScaler(),
-            # KNeighborsRegressor(n_neighbors= min(3, len(group)))
-            KNeighborsRegressor(n_neighbors=3))
+            # KNeighborsRegressor(n_neighbors= min(3, len(group))))
+            KNeighborsRegressor(n_neighbors=6))
 
         model.fit(X_train, y_train)
         # Validate the model on the validation set
