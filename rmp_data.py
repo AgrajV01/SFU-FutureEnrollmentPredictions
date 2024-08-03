@@ -5,6 +5,9 @@
 
 # Code for Extracting Data from ratemyprofessor by using web scrapping 
 
+#https://github.com/ggSamoora/TutorialsBySamoora/blob/main/rate_my_professor_script.Rmd (Gained Knowledge)
+#https://realpython.com/beautiful-soup-web-scraper-python/ (Gained Knowledge)
+
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
