@@ -7,7 +7,6 @@ This project focuses on predicting the number of course sections needed based on
 ## SFU Dataset
 
 - **Course section availability**: https://www.sfu.ca/irp/courses/CourseSectionAvailabilityReport.html
-- **Enrolment Registration reports**: https://www.sfu.ca/irp/enrolments.html
 - **Course Diggers**: https://coursediggers.com/pages/explore
 - **Rate My Professors**: https://www.ratemyprofessors.com/search/professors/1482?q=*
 
